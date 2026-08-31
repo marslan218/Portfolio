@@ -10,7 +10,7 @@ window.PORTFOLIO_DATA = {
     "To add a project: copy an existing project object in the projects list, then change its id, page, and text."
   ],
   "site": {
-    "name": "Muhammad Arslan",
+    "name": "Muhammad Arsl",
     "role": "UI/UX & Product Designer",
     "pageTitle": "Wardah Shafi — Product Designer",
     "tagline": "Thinking. Tinkering. Thinking.",
