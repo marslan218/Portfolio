@@ -1,0 +1,1999 @@
+/* ============================================================
+   Wardah Shafi — Portfolio stylesheet
+   Layered: fonts → reset → tokens → base → layout
+            → cs-* primitives → landing → work → progress → fx
+   ============================================================ */
+
+/* ─── Fonts ─── */
+@font-face {
+  font-family: 'Open Runde';
+  src: url('../fonts/OpenRunde-Regular.woff') format('woff');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Open Runde';
+  src: url('../fonts/OpenRunde-Medium.woff') format('woff');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Open Runde';
+  src: url('../fonts/OpenRunde-Semibold.woff') format('woff');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Berranger Hand ITC Std';
+  src: url('../fonts/BerrangerHandITCStd-Regular.otf') format('opentype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── Design tokens ─── */
+:root {
+  /* Color — light theme */
+  --text-primary:   #323232;
+  --text-secondary: #737373;
+  --text-tertiary:  #a1a1a1;
+  --text-black:     #050505;
+  --bg:             #ffffff;
+  --bg-subtle:      #f9f9f9;
+  --bg-muted:       #f5f5f5;
+  --border:         #e8e8f0;
+  --brand-dot:      #ff6240;
+
+  /* Inverse "pill" button (Visit / CTA). Flips in dark so the black pill
+     becomes a light pill instead of vanishing on the near-black base. */
+  --btn-bg:         #000000;
+  --btn-fg:         #ffffff;
+
+  /* Type */
+  --font:      'Open Runde', system-ui, sans-serif;
+  --font-hand: 'Berranger Hand ITC Std', cursive;
+  --fs-xs:   12px;
+  --fs-sm:   13px;
+  --fs-base: 14px;
+  --fs-md:   15px;
+  --fs-lg:   16px;
+  --fs-xl:   18px;
+  --fs-2xl:  20px;
+  --fs-3xl:  24px;
+
+  /* Spacing scale (rem-equivalent intentionally avoided — px matches Figma) */
+  --sp-1:  4px;
+  --sp-2:  6px;
+  --sp-3:  8px;
+  --sp-4:  12px;
+  --sp-5:  16px;
+  --sp-6:  20px;
+  --sp-7:  24px;
+  --sp-8:  32px;
+  --sp-9:  36px;
+  --sp-10: 40px;
+  --sp-11: 52px;
+  --sp-12: 60px;
+  --sp-15: 100px;
+
+  /* Radius */
+  --r-xs:   4px;
+  --r-sm:   6px;
+  --r-md:   8px;
+  --r-lg:   10px;
+  --r-xl:   12px;
+  --r-pill: 100px;
+
+  /* Layout widths (from Figma) */
+  --col:  725px;   /* text content column */
+  --bp-1: 1228px;  /* standard breakout */
+  --bp-2: 1362px;  /* persona / journey breakout */
+  --bp-3: 1421px;  /* full empathy / persona-row breakout */
+  --pad:  40px;    /* default horizontal page padding */
+
+  /* Motion */
+  --t-fast: 150ms;
+  --t-base: 250ms;
+  --t-slow: 750ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Reference easings sampled from the inspiration sites (lorenzodossi.com):
+     --ease-expo is its --faster-start-easing, --ease-glide its --fast-start-easing.
+     Used by the work-card / jump-next / view-project interactions below. */
+  --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-glide: cubic-bezier(0.17, 0.67, 0.1, 0.99);
+  --t-wave: 1.5s;
+
+  /* View-transition (dark-mode reveal) */
+  --vt-x: 50%;
+  --vt-y: 50%;
+  --vt-radius: 150vmax;
+}
+
+html.dark {
+  /* Figma-sourced dark theme — matches Wardah's dark mode screens exactly. */
+  --text-primary:   #fafafa;   /* names, project titles, active topbar label */
+  --text-secondary: #a1a1a1;   /* body copy, descriptions, bio paragraphs */
+  --text-tertiary:  #525252;   /* section labels, sidebar labels, eyebrows */
+  --text-black:     #fafafa;   /* hero titles, brand names, high-emphasis text */
+  --bg:             #0d0d0d;   /* base */
+  --bg-subtle:      #161616;   /* surface (sidebar, frames) */
+  --bg-muted:       #262626;   /* raised surface (icon bgs, visit btn, card) */
+  --border:         #303030;   /* all hairlines and dividers */
+  --brand-dot:      #ff6f50;
+
+  /* Visit/CTA pill: dark raised chip on dark page */
+  --btn-bg:         #262626;
+  --btn-fg:         #e6e6e6;
+}
+
+/* ─── Dark-mode component overrides ───
+   Components with baked-in (light-tuned) colors that the token swap alone
+   can't reach. Values sourced directly from Figma dark-mode frames. */
+
+/* Topbar: breadcrumb "Wardah Shafi" is dimmer than body copy (#a1a1a1) */
+html.dark .cs-topbar-author-name { color: #737373; }
+
+/* LP: role "Product Designer" should be tertiary-level, not secondary */
+html.dark .identity .role { color: var(--text-tertiary); }
+
+/* LP: project icon backgrounds use raised surface (#262626) */
+html.dark .project-icon.bg-subtle { background: var(--bg-muted); }
+
+/* Info/value text: Figma dark uses #e6e6e6 for dense info values (sidebar
+   values, work-card body/values, hero stats) — softer than titles (#fafafa)
+   but brighter than reading prose (#a1a1a1). In light these use --text-black,
+   so the swap lands on #fafafa; override the value-type elements only. */
+html.dark .cs-sidebar-value,
+html.dark .cs-stat-value,
+html.dark .showcase-about-text,
+html.dark .showcase-bullet,
+html.dark .showcase-view-link,
+html.dark .showcase-meta-value { color: #e6e6e6; }
+
+/* Breadcrumb current-page label: #e6e6e6 in Figma dark (not full #fafafa) */
+html.dark .cs-topbar-page { color: #e6e6e6; }
+
+/* Case-study brand tagline: muted #737373 in Figma dark (not body #a1a1a1) */
+html.dark .cs-brand-tagline { color: #737373; }
+
+/* #13: case-study header logos are monochrome dark marks; Figma shows them
+   white in dark mode (868:3814). brightness(0) flattens to black, invert(1)
+   to white — preserves the glyph shape, recolours to white, light untouched. */
+html.dark .cs-brand-logo { filter: brightness(0) invert(1); }
+
+/* #30,#31: case-study phone-mockup stroke is 0.5px #202020 in Figma dark
+   (868:4014 Swarp, 280:203 VYBSTK) — the token border (#303030) read heavier. */
+html.dark .cs-phone { border-color: #202020; }
+
+/* LP: theme/sound/email icons — dimmer than body text but visible */
+html.dark .lp-icon { color: #737373; }
+html.dark .lp-icon:hover { color: var(--text-primary); }
+
+/* Landing icon tooltip — lift off the near-black page */
+html.dark .lp-icon[data-tooltip]::after {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+/* Browser chrome: hairline + URL bar (color stays readable, not tertiary #525252) */
+html.dark .browser-toolbar { border-bottom-color: rgba(255,255,255,0.07); }
+html.dark .browser-url-bar {
+  background: rgba(255,255,255,0.06);
+  color: #737373;
+}
+
+/* Work page: showcase arrow button */
+html.dark .showcase-arrow {
+  background: var(--bg-muted);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+html.dark .showcase-arrow:hover {
+  box-shadow: 4px 4px 20px 2px rgba(0,0,0,0.5);
+}
+
+/* Work page: breadcrumb pill */
+html.dark .showcase-breadcrumb {
+  background: var(--bg-muted);
+  border-color: var(--border);
+}
+/* #14: breadcrumb spans carry inline light-mode colours, so the project name
+   stays dark/invisible on the dark pill. In dark, the name is #fafafa and the
+   rest (emoji, dash, tagline) #a1a1a1 (Figma 67:4196). !important beats inline. */
+html.dark .showcase-breadcrumb span { color: #a1a1a1 !important; }
+html.dark .showcase-breadcrumb span:nth-child(2) { color: #fafafa !important; }
+
+/* Progress tracker (single expanding pill) — flat black + subtle hairline */
+html.dark .progress-tracker {
+  background: #272727;           /* #29: Figma nav pill on dark pages (868:4079) */
+  border: 0.5px solid #202020;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+}
+html.dark .progress-pill-pct { background: #525252; }  /* #29: Figma dark % chip */
+
+/* ─── View-transition (dark-mode toggle) ─── */
+::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) {
+  mix-blend-mode: normal;
+  animation: vt-reveal 550ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes vt-reveal {
+  from { clip-path: circle(0 at var(--vt-x) var(--vt-y)); }
+  to   { clip-path: circle(var(--vt-radius) at var(--vt-x) var(--vt-y)); }
+}
+
+/* ─── Base ─── */
+html, body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+body   { overflow-x: clip; } /* `clip` not `hidden` — `hidden` creates a scroll container and breaks position:sticky on descendants */
+a      { text-decoration: none; color: inherit; }
+img    { display: block; max-width: 100%; }
+button { font-family: var(--font); cursor: pointer; border: none; background: none; }
+p      { word-break: break-word; }
+
+/* ============================================================
+   CASE-STUDY DESIGN SYSTEM (.cs-*)
+   ============================================================ */
+
+/* ─── Page wrapper ─── */
+.cs-page { padding-bottom: 120px; }
+
+/* ─── Topbar breadcrumb (sticky, compacts on scroll) ───
+   Behaviour matched exactly to calebwu.ca/RevisionDojo: the bar is pinned at
+   the top, its top padding shrinks 72px -> 16px and the breadcrumb row gap
+   shrinks 32px -> 16px on scroll, both on a 300ms ease. */
+.cs-topbar {
+  --cs-topbar-ease: cubic-bezier(0.62, 0.61, 0.02, 1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 32px 32px;
+  transition: padding 0.3s var(--cs-topbar-ease);
+}
+/* #33: fade backdrop (calebwu .nav-bg) — no blur. A scrim of the page colour
+   sits behind the bar and extends a little below it, solid at the top and
+   fading to transparent downward, so content scrolling underneath dissolves
+   into the page rather than blurring. Mirrors calebwu's pairing of a
+   background gradient (bg 5% → transparent) with a softening mask gradient
+   (1 → 0.73 @45% → 0); the scrim colour follows the theme via var(--bg). */
+.cs-topbar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -44px 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--bg) 5%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.73) 45%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,0.73) 45%, transparent 100%);
+}
+/* Chevron hugs the author name; the larger (animating) gap sits before the
+   page title so the chevron reads as part of "Wardah Shafi ›". */
+.cs-topbar-breadcrumb {
+  display: flex; align-items: center;
+  gap: 10px;
+  transition: gap 0.3s var(--cs-topbar-ease);
+}
+.cs-topbar-page {
+  margin-left: 18px;
+  transition: margin-left 0.3s var(--cs-topbar-ease);
+}
+/* Counter-balance: padding-top 72->16 (-56), padding-bottom 32->88 (+56)
+   keeps the topbar's total height constant so it doesn't reflow the page
+   below during the compaction transition (was causing the work page's
+   sticky mockups to jitter at the threshold). */
+.cs-topbar--scrolled { padding-top: 16px; padding-bottom: 88px; }
+.cs-topbar--scrolled .cs-topbar-breadcrumb { gap: 8px; }
+.cs-topbar--scrolled .cs-topbar-page { margin-left: 8px; }
+.cs-topbar-author     { display: flex; align-items: center; gap: var(--sp-3); }
+.cs-topbar-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--brand-dot); flex-shrink: 0;
+}
+.cs-topbar-author-name {
+  font-size: var(--fs-md); font-weight: 400; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.cs-topbar-chevron { width: 12px; height: 12px; flex-shrink: 0; opacity: 0.5; }
+.cs-topbar-page {
+  font-size: var(--fs-md); font-weight: 500; color: var(--text-primary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+
+/* When the topbar precedes the page-header (sidebar case studies), drop the
+   header's own top padding so we don't double up the vertical gap. */
+.cs-topbar + .cs-page-header { padding-top: 0; }
+
+/* ─── Visit button (black pill with optional arrow) ─── */
+/* Link-icon pill — replaces the "Visit" text button in case-study heroes /
+   headers (Figma 1177:5067). 32px round button, theme-aware. */
+.cs-visit-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  position: relative;             /* anchor for the absolute checkmark (#54) */
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: #fbfbfb;
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-pill);
+  color: #2b2b2b;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+.cs-visit-link svg { width: 16px; height: 16px; display: block;
+  transition: transform var(--t-base) var(--ease-out), opacity var(--t-fast) var(--ease-out); }
+/* #54: copy-link icon (Figma component 1274:6362 "Copy Link Icon"). Motion lifted
+   from the inspiration's `.copy-to-clipboard` component (lorenzodossi.com): the two
+   chain-link halves (paths 2 & 3) splay APART from the centre line on hover and
+   nudge back together on press; the middle line (path 1) stays put. Click (JS)
+   copies the link and the whole glyph cross-fades to a checkmark, then back. */
+.cs-visit-link svg:not(.cl-check) path { transition: transform 0.6s var(--ease-expo); }
+.cs-visit-link:hover svg:not(.cl-check) path:nth-child(2) { transform: translate(1px, -1px); }
+.cs-visit-link:hover svg:not(.cl-check) path:nth-child(3) { transform: translate(-1px, 1px); }
+.cs-visit-link:active svg:not(.cl-check) path:nth-child(2) { transform: translate(-0.25px, 0.25px); }
+.cs-visit-link:active svg:not(.cl-check) path:nth-child(3) { transform: translate(0.25px, -0.25px); }
+.cs-visit-link .cl-check {
+  position: absolute; inset: 0; margin: auto;
+  opacity: 0; transform: scale(0.5);
+}
+.cs-visit-link.copied svg:not(.cl-check) { opacity: 0; transform: scale(0.5); }
+.cs-visit-link.copied .cl-check { opacity: 1; transform: none; }
+/* #54: work-page copy-link icon — same interaction as .cs-visit-link (chain-link
+   halves splay on hover, press together on click; click copies the link and the
+   glyph cross-fades to a checkmark). JS wraps the icon in .cl-iconwrap so the
+   checkmark can overlay it. */
+.cl-iconwrap { position: relative; display: inline-flex; }
+.showcase-ext-link .link-ico path { transition: transform 0.6s var(--ease-expo); }
+.showcase-ext-link:hover .link-ico path:nth-child(2) { transform: translate(1px, -1px); }
+.showcase-ext-link:hover .link-ico path:nth-child(3) { transform: translate(-1px, 1px); }
+.showcase-ext-link:active .link-ico path:nth-child(2) { transform: translate(-0.25px, 0.25px); }
+.showcase-ext-link:active .link-ico path:nth-child(3) { transform: translate(0.25px, -0.25px); }
+.showcase-ext-link .link-ico { transition: opacity var(--t-fast) var(--ease-out); }
+.cl-iconwrap .cl-check {
+  position: absolute; inset: 0; margin: auto;
+  width: var(--fs-lg); height: var(--fs-lg);
+  opacity: 0; transform: scale(0.5);
+  transition: opacity var(--t-fast) var(--ease-out), transform var(--t-base) var(--ease-out);
+}
+.showcase-ext-link.copied .link-ico { opacity: 0; }
+.showcase-ext-link.copied .cl-check { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .cs-visit-link svg:not(.cl-check) path, .showcase-ext-link .link-ico path { transition: none; }
+  .cs-visit-link:hover svg:not(.cl-check) path,
+  .cs-visit-link:active svg:not(.cl-check) path,
+  .showcase-ext-link:hover .link-ico path,
+  .showcase-ext-link:active .link-ico path { transform: none; }
+}
+html.dark .cs-visit-link { background: #161616; color: var(--text-primary); }
+
+.cs-visit-btn {
+  display: inline-flex; align-items: center;
+  gap: var(--sp-1);
+  background: var(--btn-bg); color: var(--btn-fg);
+  border-radius: var(--r-pill);
+  padding: 6px 10px 6px 12px;
+  font-size: var(--fs-base); font-weight: 600;
+  letter-spacing: -0.01em; line-height: 1.4;
+  white-space: nowrap; flex-shrink: 0;
+  transition: opacity var(--t-fast);
+}
+.cs-visit-btn:hover { opacity: 0.8; }
+.cs-visit-btn img,
+.cs-visit-btn svg { width: 15px; height: 16px; }
+
+/* ─── Section label row (eyebrow + horizontal rule) ─── */
+.cs-label-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  width: 100%;
+}
+.cs-label-row span,
+.cs-label-row .cs-label {
+  font-size: var(--fs-sm); font-weight: 500; color: var(--text-tertiary);   /* #61: section label = Medium 500 */
+  letter-spacing: -0.01em; line-height: 1.5; white-space: nowrap;
+}
+.cs-rule {
+  flex: 1; min-width: 0;
+  height: 0;
+  border-top: 1px dashed var(--border);
+}
+
+/* ─── Content block (title + body) ─── */
+.cs-content-block {
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.cs-block-title {
+  font-size: var(--fs-lg); font-weight: 500; color: var(--text-black);   /* #43.2: Figma section title = 16px Medium (was 20px) */
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.cs-block-body {
+  font-size: var(--fs-md); font-weight: 400; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+
+/* ─── 3-column equal grid (approach / capabilities) ─── */
+.cs-grid-3 {
+  display: flex; gap: var(--sp-7);
+}
+.cs-grid-3-item {
+  flex: 1; display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.cs-grid-3-title {
+  font-size: var(--fs-lg); font-weight: 500; color: var(--text-primary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.cs-grid-3-body {
+  font-size: var(--fs-md); font-weight: 400; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+
+/* ─── Quote (vertical bar + emphasised text) ─── */
+.cs-quote {
+  display: flex; gap: var(--sp-5);
+  align-items: center;
+}
+.cs-quote-bar {
+  width: 1px; min-height: 20px; align-self: stretch;
+  background: var(--text-black); flex-shrink: 0;
+}
+.cs-quote-text {
+  font-size: var(--fs-lg); font-weight: 500; color: var(--text-black);   /* #43.2: Figma callout = 16px Medium (was 20px) */
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+
+/* ─── Visual frame (bg-subtle card holding a wide visual) ─── */
+.cs-frame {
+  width: 100%;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--bg-subtle);
+  border: 0.5px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.cs-frame img {
+  width: 100%; height: auto; object-fit: cover; display: block;
+}
+
+/* ============================================================
+   FEATURED case-study layout (vmd, bayut)
+   Centered single column, with controlled width "breakouts".
+   ============================================================ */
+
+/* Page-level wrapper: centered 860px = 724px content + 68px padding each side. */
+.cs-featured {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 68px;
+  display: flex; flex-direction: column;
+  gap: var(--sp-15);
+  overflow: visible;
+}
+
+/* Hero block */
+.cs-hero {
+  display: flex; flex-direction: column; gap: var(--sp-8);
+}
+.cs-hero-header { display: flex; flex-direction: column; gap: 6px; }
+.cs-eyebrow {
+  font-size: var(--fs-sm); font-weight: 500; color: var(--text-tertiary);   /* #61: section-label style = Medium 500 */
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.cs-hero-title-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-7); width: 100%;
+}
+.cs-hero-title {
+  font-size: var(--fs-xl); font-weight: 500; color: var(--text-black);   /* #59/#60: web hero heading = 18px (was 20px) */
+  letter-spacing: -0.01em; line-height: 1.5;
+  flex: 1;
+}
+
+/* Stats row (Role / Timeline / Team / Scope) */
+.cs-stats-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  width: 100%;
+  font-size: var(--fs-base); letter-spacing: -0.01em;
+}
+.cs-stat { display: flex; flex-direction: column; gap: var(--sp-3); }
+.cs-stat-label {
+  font-weight: 500; color: var(--text-tertiary); line-height: 1.5;
+}
+.cs-stat-value {
+  font-weight: 400; color: var(--text-black); line-height: 1.4;
+}
+
+/* Sections wrapper inside featured layout */
+.cs-sections { display: flex; flex-direction: column; gap: var(--sp-12); }
+
+/* Section block (one logical section: label-row + content + media).
+   Children stretch to full column width by default. Breakouts override
+   via explicit width + negative margin and self-position regardless. */
+.cs-section-block {
+  display: flex; flex-direction: column; gap: var(--sp-9);
+  width: 100%;
+}
+.cs-section-inner {
+  display: flex; flex-direction: column; gap: var(--sp-7);
+  width: 100%;
+}
+
+/* Breakout: extend outside the 724px column up to a max width.
+   Featured page padding is 68px each side; --col is 724px.
+   We center against the page width, not the content column. */
+.cs-breakout {
+  width: min(var(--bp-1), 100vw);
+  margin-left: calc((min(var(--bp-1), 100vw) - 100%) / -2);
+  margin-right: 0;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.cs-breakout > img {
+  width: 100%; height: auto; display: block;
+}
+/* Light/dark image variants inside a breakout (Figma ships separate exports). */
+.cs-breakout > img.dk { display: none; }
+html.dark .cs-breakout > img.lt { display: none; }
+html.dark .cs-breakout > img.dk { display: block; }
+.cs-breakout--diagram {
+  width: min(var(--bp-2), 100vw);
+  margin-left: calc((min(var(--bp-2), 100vw) - 100%) / -2);
+}
+.cs-breakout--xwide {
+  width: min(var(--bp-3), 100vw);
+  margin-left: calc((min(var(--bp-3), 100vw) - 100%) / -2);
+}
+
+/* ============================================================
+   SIDEBAR case-study layout (thb, swarppay, holos, vybstk)
+   Sticky sidebar on the left + scrollable main column on the right.
+   ============================================================ */
+
+.cs-layout {
+  display: flex;
+  gap: var(--sp-4);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 113px;
+}
+
+.cs-page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1440px; margin: 0 auto var(--sp-11);
+  padding: var(--sp-11) 113px 0;
+}
+.cs-brand {
+  display: flex; align-items: center; gap: var(--sp-1);
+}
+.cs-brand-logo { width: 24px; height: 24px; flex-shrink: 0; object-fit: contain; }
+
+/* Mobile-only brand header for the featured case studies (VirtualMD,
+   Bayut) — hidden on desktop, revealed by the responsive layer. */
+.cs-featured-brand { display: none; }
+
+/* Mobile-only hero image for featured case studies — the Work-page
+   info-card preview, swapped in for the wide web-view hero on phones. */
+.cs-hero-mobile-media { display: none; }
+
+/* Mobile-only final-design image — Figma's mobile-tuned version (larger,
+   more legible mockup), swapped in for the web composition on phones. */
+.cs-final-mobile { display: none; }
+.cs-brand-info { display: flex; align-items: center; gap: var(--sp-2); }
+.cs-brand-name {
+  font-size: var(--fs-xl); font-weight: 500; color: var(--text-black);
+  letter-spacing: -0.01em; line-height: 1.5; white-space: nowrap;
+}
+.cs-brand-sep { width: 4px; height: 4px; flex-shrink: 0; }
+.cs-brand-tagline {
+  font-size: var(--fs-base); font-weight: 400; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.4; white-space: nowrap;
+}
+
+/* Sidebar card */
+.cs-sidebar {
+  width: 348px;
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--sp-10);
+  align-self: flex-start;
+  background: var(--bg-subtle);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4) var(--sp-4) var(--sp-6);
+  display: flex; flex-direction: column;
+  gap: var(--sp-6);
+}
+.cs-sidebar-section {
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.cs-sidebar-label {
+  font-size: var(--fs-base); font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.cs-sidebar-value {
+  font-size: var(--fs-base); font-weight: 400; color: var(--text-black);
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+
+/* Main column */
+.cs-main {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  gap: var(--sp-9);
+  align-items: center;
+}
+
+/* Text block (constrained narrow width inside sidebar layout) */
+.cs-text-block {
+  display: flex; flex-direction: column; gap: var(--sp-7);
+  width: 618px; max-width: 100%;
+}
+.cs-text-block .cs-block-title {
+  font-size: var(--fs-lg);
+}
+.cs-text-block-body-group {
+  display: flex; flex-direction: column; gap: var(--sp-5);
+}
+
+/* Phone screenshot row (used by all four sidebar-style case studies) */
+.cs-phone-row {
+  display: flex; align-items: center; gap: 16.67px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+/* Wide variant: 4 phones in a single row, no wrap. Phones flex-share the
+   available width while keeping their 182:394 aspect ratio. */
+.cs-phone-row--wide {
+  width: 778px; max-width: 100%;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+.cs-phone-row--wide .cs-phone {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  max-width: 182px;
+  height: auto;
+  aspect-ratio: 182 / 394;
+}
+.cs-phone {
+  width: 182px;
+  height: 394px;
+  border-radius: 24px;
+  border: 0.5px solid var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-muted);
+  position: relative;
+}
+.cs-phone img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ============================================================
+   LANDING PAGE (.lp-*)
+   ============================================================ */
+.lp-main { padding-bottom: 120px; }
+
+.lp-content {
+  display: flex; gap: var(--sp-15);
+  align-items: flex-start;
+  padding: var(--sp-11) var(--pad) 0;
+  max-width: 855px;
+  margin: 0 auto;
+}
+
+.lp-left {
+  width: 365px; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 64px;
+}
+.lp-top {
+  display: flex; flex-direction: column; gap: var(--sp-8);
+}
+.identity { display: flex; flex-direction: column; gap: 2px; }
+.identity .name {
+  font-size: var(--fs-lg); font-weight: 500; color: var(--text-primary);
+  letter-spacing: -0.01em; line-height: 1.5;
+  cursor: default;
+}
+/* On hover, a random scatter of letters dims to tertiary (set from main.js) */
+.identity .name .name-char { transition: color var(--t-fast) ease; }
+.identity .name .name-char--dim { color: var(--text-tertiary); }
+.identity .role {
+  font-size: var(--fs-md); font-weight: 400; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.sections { display: flex; flex-direction: column; gap: var(--sp-9); }
+.bio { display: flex; flex-direction: column; gap: var(--sp-5); }
+.bio p {
+  font-size: var(--fs-md); font-weight: 400; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+
+.linkedin-connect {
+  display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
+  font-size: var(--fs-md); font-weight: 400; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.linkedin-inline {
+  display: inline-flex; align-items: center; gap: var(--sp-1);
+  color: var(--text-black);
+}
+/* #58: jakub.kr link hover — the label is always underlined in a muted colour,
+   and on hover the underline transitions to full over 0.2s ease. Only the text
+   is underlined (the icon badge sits before it). */
+.linkedin-inline .li-text {
+  text-decoration: underline;
+  text-decoration-color: var(--text-tertiary);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+.linkedin-inline:hover .li-text { text-decoration-color: var(--text-black); }
+.li-icon-wrap {
+  width: var(--fs-lg); height: var(--fs-lg);
+  border-radius: var(--r-xs); overflow: hidden;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.1); flex-shrink: 0;
+}
+.li-icon-wrap img { width: 100%; height: 100%; }
+/* #12: the inline LinkedIn mark has a white tile + dark glyph that reads wrong
+   on the dark page. Swap to the Figma dark export (#0D0D0D tile + #FAFAFA glyph)
+   in dark mode; light is unchanged. */
+.li-icon-wrap .li-dark { display: none; }
+html.dark .li-icon-wrap .li-light { display: none; }
+html.dark .li-icon-wrap .li-dark { display: block; }
+
+/* Shared section header used by landing-page sections */
+.section-header { display: flex; align-items: center; gap: var(--sp-3); }
+.section-label {
+  font-size: var(--fs-sm); font-weight: 500; color: var(--text-tertiary);
+  letter-spacing: -0.01em; line-height: 1.5; white-space: nowrap;
+}
+.divider-line {
+  flex: 1; min-width: 0;
+  height: 0;
+  border-top: 1px dashed var(--border);
+}
+
+.section { display: flex; flex-direction: column; gap: var(--sp-7); }
+.project-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+/* Project row (links to case studies / socials).
+   Hover paints a soft rounded highlight behind the row; horizontal negative
+   margin lets it bleed past the content edge while keeping text aligned. */
+.project-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: var(--sp-3) var(--sp-4);
+  margin: 0 calc(var(--sp-4) * -1);
+  border-radius: var(--r-lg);
+  transition: background var(--t-fast), transform var(--t-fast) var(--ease-out);
+}
+.project-row:hover { background: var(--bg-subtle); }
+.project-row:active { transform: scale(0.98); }   /* #57: press feedback (ch.sh) */
+/* #57: ch.sh row hover — the logo scales up slightly and a ↗ arrow reveals on the
+   right. On touch (no hover) the arrow is always shown. */
+.project-icon-img { transition: transform var(--t-fast) var(--ease-out); }
+.project-row:hover .project-icon-img { transform: scale(1.1); }
+/* Keep the icon box distinct from the row highlight on hover (ch.sh: the icon box
+   stays a touch lighter than the row). In light the box + row are both bg-subtle,
+   so lift the box to white; dark's bg-muted box is already distinct. */
+.project-icon { transition: background var(--t-fast) var(--ease-out); }
+html:not(.dark) .project-row:hover .project-icon.bg-subtle { background: #fff; }
+.project-row::after {
+  content: ""; flex-shrink: 0; margin-left: auto;
+  width: 14px; height: 14px;
+  background-color: var(--text-tertiary);
+  -webkit-mask: url("../assets/row-arrow.svg") center / contain no-repeat;
+          mask: url("../assets/row-arrow.svg") center / contain no-repeat;
+}
+@media (hover: hover) {
+  .project-row::after { opacity: 0; transition: opacity var(--t-fast) var(--ease-out); }
+  .project-row:hover::after { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-icon-img, .project-row { transition: none; }
+  .project-row:hover .project-icon-img, .project-row:active { transform: none; }
+}
+
+.project-icon {
+  width: var(--sp-10); height: var(--sp-10);
+  border-radius: var(--r-lg);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.project-icon.bg-subtle { background: var(--bg-subtle); }
+/* Project/Connect logos: the SVG is a CSS mask filled with a theme-aware
+   colour, so a single asset recolours between light and dark (issue #5). */
+.project-icon-img {
+  display: block;
+  background-color: var(--text-black);
+  -webkit-mask: var(--logo) center / 100% 100% no-repeat;
+          mask: var(--logo) center / 100% 100% no-repeat;
+}
+
+.project-info { flex: 1; min-width: 0; }
+.project-name {
+  font-size: var(--fs-md); font-weight: 500; color: var(--text-primary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.project-desc {
+  font-size: var(--fs-base); font-weight: 400; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+
+/* Footer (case-study + work page) — same look as landing footer but
+   horizontally centered across the page. */
+.cs-footer {
+  display: flex; align-items: center; gap: var(--sp-7);
+  padding: var(--sp-8) var(--pad);
+  max-width: 1421px;
+  margin: var(--sp-12) auto 0;
+}
+
+/* Landing footer */
+.lp-footer { display: flex; align-items: center; gap: var(--sp-7); }
+.footer-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+}
+.footer-meta { display: flex; align-items: center; gap: var(--sp-1); }
+.footer-text {
+  font-size: var(--fs-sm); font-weight: 500; color: var(--text-secondary);
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+.footer-dot {
+  width: 2px; height: 2px; border-radius: 50%;
+  background: var(--text-secondary); flex-shrink: 0;
+}
+
+/* Landing right column — icons + view-work card */
+.lp-right {
+  width: 390px; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: var(--sp-6);
+  align-items: flex-end;
+}
+.lp-icons { display: flex; align-items: center; gap: var(--sp-4); }
+/* Figma header icon spacing: 14px after Email, 12px between Sound↔Theme
+   (frames 920:9848 desktop / 934:14822 mobile). Shared gap is 12; Email gets
+   +2 so its trailing gap reads 14. */
+.lp-icons .lp-icon:first-child { margin-right: 2px; }
+.lp-icon {
+  width: 22px; height: 22px;          /* Figma header-icon frame (22×22) */
+  color: var(--text-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  transition: color var(--t-fast);
+  position: relative;
+}
+.lp-icon:hover { color: var(--text-primary); }
+/* Tooltip on hover (label from data-tooltip) */
+.lp-icon[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #111;
+  color: #fff;
+  font-size: var(--fs-xs); font-weight: 500;
+  letter-spacing: -0.01em; line-height: 1;
+  padding: 5px 8px;
+  border-radius: var(--r-sm);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t-fast) var(--ease-out),
+              transform var(--t-fast) var(--ease-out);
+  z-index: 60;
+}
+/* Tooltips are a hover-only affordance. On touch devices (no hover) they can't be
+   triggered, and because they're centred on the top-right icons with white-space:
+   nowrap they extend past the right viewport edge — forcing horizontal overflow on
+   mobile (page loads scrolled/zoomed). Remove the pseudo entirely on touch. */
+@media (hover: none) {
+  .lp-icon[data-tooltip]::after { content: none; }
+}
+.lp-icon:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.lp-icon img, .lp-icon svg { width: 22px; height: 22px; display: block; }
+
+/* State swaps for the sound + theme toggles. Scoped under .lp-icon so the
+   hide rule beats the `.lp-icon svg { display:block }` above on specificity
+   (otherwise both states would show at once). */
+.lp-icon .sound-icon-off { display: none; }
+html.sound-muted .lp-icon .sound-icon-off { display: block; }
+html.sound-muted .lp-icon .sound-icon-on  { display: none; }
+
+.lp-icon .theme-icon-sun { display: none; }
+html.dark .lp-icon .theme-icon-sun  { display: block; }
+html.dark .lp-icon .theme-icon-moon { display: none; }
+
+/* "View work" card */
+.view-work-card {
+  width: 390px; height: 220px;
+  background: var(--bg-muted);
+  border-radius: var(--r-md);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity var(--t-fast);
+}
+/* Hero reel fills the card; the "View work" pill sits on top. */
+.view-work-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.view-work-btn { position: relative; z-index: 1; }
+
+/* Case-study videos — fill whatever media container they sit in (hero frame,
+   phone frame, final-design frame). The container provides the size + overflow;
+   the video crops to cover. Viewport-gated playback via main.js. */
+.cs-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* #69: the EXACT Figma iPhone (1169:3887 — titanium frame + black bezel + side
+   buttons + Dynamic Island) is exported as the background image; the video sits
+   over the screen area (Replace = screen-here 306×678 @ 10,10 in the 325×698
+   mockup, offset +2.4 for the buttons → % of the 330.3×698 export). The Dynamic
+   Island is re-laid on top since the video covers it. */
+.cs-iphone {
+  position: relative;
+  width: 45.6%;                  /* 330.3 / 725 (export width incl. buttons) */
+  aspect-ratio: 330.3 / 698;
+  background: url("../assets/cs-bayut-iphone.png") center / 100% 100% no-repeat;
+}
+.cs-iphone .cs-video {
+  position: absolute;
+  left: 3.75%; top: 1.43%;
+  width: 92.64%; height: 97.13%;
+  border-radius: 11% / 5%;
+  object-fit: cover;
+}
+.cs-iphone-island {
+  position: absolute; top: 2.74%; left: 50%; transform: translateX(-50%);
+  width: 26.6%; height: 3.6%;
+  background: #000; border-radius: 100px; z-index: 2;
+}
+.view-work-card:hover { opacity: 0.9; }
+.view-work-btn {
+  background: rgba(142, 144, 148, 0.6); color: #fff;
+  border-radius: var(--r-pill); padding: var(--sp-2) 10px;
+  font-size: var(--fs-base); font-weight: 500;
+  letter-spacing: -0.01em; line-height: 20px;
+  box-shadow: 0 0 32px rgba(0,0,0,0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   WORK PAGE
+   ============================================================ */
+.work-main { padding-bottom: 120px; }
+
+/* Showcase list */
+.work-showcase-list {
+  display: flex; flex-direction: column; gap: 0;
+  padding: 0 113px;
+  max-width: 1440px; margin: 0 auto;
+}
+
+.showcase-row {
+  display: flex; gap: var(--sp-4);
+  align-items: flex-start;
+  padding: var(--sp-9) 0;
+  scroll-margin-top: 96px; /* #37: land below the sticky breadcrumb on jump */
+}
+
+/* Left column — wraps the mockup so its sticky pin range is decoupled from
+   the (taller, content-driven) info column. On desktop its height is the
+   mockup height plus the info card's top offset, so the card slides up to
+   meet the mockup top and stops exactly there — never rising above it. */
+.showcase-mockup-col {
+  flex: 0 1 855px; width: 855px; min-width: 0;   /* shrink below 855 so the rigid row fits 13"/~1325px without eating the right gutter (the info col stays 348) */
+}
+
+/* Left mockup panel */
+.showcase-mockup {
+  width: 100%; max-width: 855px; height: auto; aspect-ratio: 855 / 610;
+  background: var(--bg-subtle);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+/* Project showcase video — sits INSIDE the mockup panel like the old browser/phone
+   mockup did (Figma 1307:1585 "Replace" = 648x433 centered in the 855x610 panel,
+   radius 8), not edge-to-edge. Width is a % of the panel so it scales on tablet;
+   the 3:2 box crops mixed-aspect reels (object-fit:cover). Lazy-played in main.js. */
+.showcase-video {
+  width: 75.8%;            /* 648 / 855 */
+  aspect-ratio: 648 / 433; /* Figma Replace layer */
+  object-fit: cover; display: block;
+  border-radius: var(--r-md);
+}
+@media (min-width: 1025px) {
+  .showcase-mockup-col {
+    height: 660px; /* 610 mockup + ~50 → card slides up to meet the mockup top (never above) */
+    align-self: flex-start;
+  }
+  .showcase-mockup {
+    position: sticky;
+    top: 100px;
+  }
+}
+
+/* Phone strip inside mockup */
+.phone-strip { display: flex; gap: var(--sp-7); align-items: center; }
+.phone-img {
+  width: 200px; height: 433px;
+  border-radius: 24px; object-fit: cover;
+  border: 0.5px solid var(--border);
+  flex-shrink: 0;
+}
+
+/* Browser mockup (VirtualMD card) */
+.browser-mockup-wrap {
+  width: 778px; height: 522px;
+  border-radius: var(--r-md);
+  border: 0.5px solid var(--border);
+  overflow: hidden; position: relative;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+}
+.browser-toolbar {
+  height: 39px; background: var(--bg);
+  border-bottom: 0.5px solid rgba(0,0,0,0.05);
+  display: flex; align-items: center;
+  padding: 0 var(--sp-3); gap: var(--sp-3);
+  flex-shrink: 0;
+}
+.browser-traffic-lights {
+  width: 32px; height: 8px;
+  display: flex; gap: 5px; align-items: center;
+  flex-shrink: 0;
+}
+.tl { width: 7.3px; height: 7.3px; border-radius: 50%; flex-shrink: 0; }
+.tl-close { background: #ff5f57; }
+.tl-min   { background: #febc2e; }
+.tl-full  { background: #28c840; }
+.browser-url-bar {
+  flex: 1; height: 25px;
+  background: rgba(0,0,0,0.05);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10.75px; color: #4c4c4c;
+  letter-spacing: -0.04em;
+  margin: 0 var(--sp-10);
+}
+.browser-screen {
+  width: 100%; flex: 1; min-height: 0;
+  overflow: hidden; position: relative;
+}
+.browser-screen img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top;
+}
+
+/* Circular ↗ button — Figma 67:4153. Always visible at rest in the mockup's
+   bottom-left corner; on mockup hover the arrow darkens grey → black and
+   lifts on a soft drop-shadow. The breadcrumb pill (below) is its companion. */
+/* #34 (lfs.gd): the arrow is hidden by default, fades in when the card/mockup is
+   hovered, and hovering the arrow itself reveals the title pill (below). */
+.showcase-arrow {
+  position: absolute;
+  left: 6px; bottom: 6px; z-index: 2;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: var(--r-pill);
+  color: #0a0a0a;
+  opacity: 0;
+  transform: translateY(6px);
+  overflow: hidden;   /* clip the two-arrow vertical swap (#34) */
+  /* #34: glide in on the site signature easeOutExpo (lfs.gd uses Framer
+     springs, not copyable CSS — matched the feel, not literal numbers). */
+  transition: opacity 0.45s var(--ease-expo),
+              transform 0.45s var(--ease-expo),
+              box-shadow var(--t-base) var(--ease-out);
+}
+.showcase-mockup:hover .showcase-arrow {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* #34: hovering the arrow runs a vertical two-arrow swap — the resting (muted)
+   arrow slides up and out while a fuller/darker one rises from behind into its
+   place (lfs.gd). The title chip reveals alongside (see .showcase-breadcrumb). */
+.sa-swap { position: relative; width: 24px; height: 24px; }
+.sa-ico {
+  position: absolute; inset: 0; width: 24px; height: 24px; display: block;
+  transition: transform 0.5s var(--ease-expo), color 0.2s var(--ease-out);
+}
+/* Both arrows travel along the glyph's own 45° axis (lfs.gd: a measured (+20px,
+   -20px) slide). The front (visible, muted) exits up-right; the darker back —
+   parked down-left, clipped — slides up-right into the centre. Opacity stays on
+   (the round button clips them), so it reads as one arrow swapping itself out. */
+.sa-ico--front { color: var(--text-secondary); z-index: 2; }
+.sa-ico--back  { color: var(--text-black); transform: translate(-20px, 20px); z-index: 1; }
+.showcase-arrow:hover .sa-ico--front { transform: translate(20px, -20px); }
+.showcase-arrow:hover .sa-ico--back  { transform: translate(0, 0); }
+.showcase-arrow:hover {
+  box-shadow: 4px 4px 20px 2px rgba(0, 0, 0, 0.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sa-ico { transition: none; }
+}
+
+/* Breadcrumb pill — hover state, hidden by default, fades in on mockup hover */
+.showcase-breadcrumb {
+  position: absolute;
+  bottom: 6px; left: 48px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: var(--r-pill);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-base); font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.45s var(--ease-expo),
+              transform 0.45s var(--ease-expo);
+  pointer-events: none;
+}
+/* #34: title appears when the arrow (or the title itself) is hovered, not on
+   bare mockup hover. The arrow and breadcrumb are siblings (arrow first). */
+.showcase-arrow:hover ~ .showcase-breadcrumb,
+.showcase-breadcrumb:hover {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Right info column */
+.showcase-info-col {
+  flex: 0 0 348px; width: 348px;
+  display: flex; flex-direction: column; gap: var(--sp-8);
+  align-items: center;
+}
+.showcase-ext-link {
+  display: flex; align-items: center; gap: var(--sp-1);
+  font-size: var(--fs-base); font-weight: 400; color: var(--text-black);
+  letter-spacing: -0.01em; line-height: 1.4;
+  white-space: nowrap;
+  transition: opacity var(--t-fast);
+}
+.showcase-ext-link:hover { opacity: 0.6; }
+/* #18: link icon is the exact Figma SVG export (node 67:4201), inlined with
+   stroke="currentColor" so it inherits each link's text colour and updates
+   per theme (#050505 light, #fafafa/#e6e6e6 dark). */
+.link-ico { display: inline-block; flex-shrink: 0; }
+.showcase-ext-link .link-ico { width: var(--fs-lg); height: var(--fs-lg); }
+
+.showcase-card {
+  background: var(--bg-subtle);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  width: 348px;
+  display: flex; flex-direction: column; gap: 28px;
+  padding: var(--sp-4) var(--sp-4) var(--sp-6);
+  flex-shrink: 0;
+}
+.showcase-card-preview {
+  width: 324px; height: 185px;
+  border-radius: var(--r-md); overflow: hidden;
+  background: var(--bg-subtle);
+  position: relative;
+  flex-shrink: 0;
+  border-bottom: 0.5px solid var(--border);
+  border-right: 0.5px solid var(--border);
+}
+.showcase-card-preview img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top;
+  transition: transform var(--t-slow) var(--ease-out);
+}
+.showcase-card-preview:hover img { transform: scale(1.045); }
+
+/* #35: the "Open website" overlay is gone — the preview just keeps its subtle
+   hover zoom and the whole card is clickable to the case study (data-cs + JS). */
+.showcase-card { cursor: pointer; }
+.showcase-card-body {
+  display: flex; flex-direction: column; gap: var(--sp-8); width: 324px;
+}
+.showcase-about { display: flex; flex-direction: column; gap: var(--sp-4); }
+.showcase-about-label {
+  font-size: var(--fs-base); font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.showcase-about-text {
+  font-size: var(--fs-base); font-weight: 400; color: var(--text-black);
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+.showcase-meta-row { display: flex; gap: var(--sp-7); align-items: flex-start; }
+.showcase-summary {
+  flex: 0 0 190px; width: 190px;
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.showcase-view {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.showcase-meta-label {
+  font-size: var(--fs-base); font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: -0.01em; line-height: 1.5;
+}
+.showcase-bullet-list { display: flex; flex-direction: column; gap: var(--sp-1); }
+.showcase-bullet {
+  display: flex; align-items: center; gap: var(--sp-2);
+  font-size: var(--fs-base); font-weight: 400; color: var(--text-black);
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+.showcase-bullet-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--text-primary); flex-shrink: 0;
+}
+.showcase-view-link {
+  display: inline-flex; align-items: center;
+  font-size: var(--fs-base); font-weight: 400; color: var(--text-black);
+  letter-spacing: -0.01em; line-height: 1.4;
+  white-space: nowrap;
+}
+.vl-name { display: inline-block; }
+/* #36: the project name + Figma arrow (876:7065, currentColor). At rest the
+   arrow sits after the name as a diagonal ↗; on hover it swaps to a straight →
+   before the name (lorenzodossi magazzino effect). */
+.vl-arrow {
+  display: inline-flex; align-items: center; overflow: hidden;
+  width: 15px; height: 16px;
+  /* #41: matched to lorenzodossi's actual link-arrow — measured live, his
+     .o-icon transitions transform over 0.75s on his --fast-start-easing
+     (cubic-bezier(.17,.67,.1,.99) = our --ease-glide), NOT easeOutExpo. That
+     gentler fast-start curve is what makes the swap feel smooth, not abrupt.
+     Opacity crossfades a touch quicker so the two arrows stay crisp. */
+  transition: width 0.75s var(--ease-glide),
+              opacity 0.5s var(--ease-glide),
+              margin 0.75s var(--ease-glide),
+              transform 0.75s var(--ease-glide);
+}
+.vl-arrow svg { width: 15px; height: 16px; display: block; flex-shrink: 0; }
+.vl-arrow--pre  { width: 0;    opacity: 0; margin-right: 0;   transform: rotate(45deg); }
+.vl-arrow--post { width: 15px; opacity: 1; margin-left: 4px;  transform: rotate(0deg); }
+.showcase-view-link:hover .vl-arrow--pre  { width: 15px; opacity: 1; margin-right: 4px; }
+.showcase-view-link:hover .vl-arrow--post { width: 0;    opacity: 0; margin-left: 0; }
+
+/* #41: lorenzodossi "luisaruzzenenti" reveal — on hover the project name rolls up
+   into place (rotateX -20deg → 0, scale .95 → 1, a 2px rise), layered over the #36
+   arrow-swap. Runs 0.75s on his --fast-start-easing (--ease-glide) to match the
+   measured reference timing/feel exactly. Theme-independent transform. */
+.vl-name { transform-origin: center bottom; backface-visibility: hidden; }
+@keyframes vl-reveal {
+  from { transform: perspective(420px) rotateX(-20deg) scale(0.95) translateY(2px); opacity: 0.5; }
+  to   { transform: perspective(420px) rotateX(0deg)   scale(1)    translateY(0);   opacity: 1; }
+}
+.showcase-view-link:hover .vl-name { animation: vl-reveal 0.75s var(--ease-glide); }
+@media (prefers-reduced-motion: reduce) {
+  .showcase-view-link:hover .vl-name { animation: none; }
+}
+
+.showcase-year-row { display: flex; gap: var(--sp-7); align-items: flex-start; }
+.showcase-year-col {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: var(--sp-4);
+}
+.showcase-meta-value {
+  font-size: var(--fs-base); font-weight: 400; color: var(--text-black);
+  letter-spacing: -0.01em; line-height: 1.4;
+}
+
+/* #37 (lorenzodossi "Jump to next project"): a dark/neutral shimmer sweeps
+   THROUGH the label on hover — a 300%-wide neutral→dark→neutral gradient
+   clipped to the text and slid right→left over 1.5s on their exact fast-start
+   easing. The down-arrow ramps from faint to solid. Click smooth-scrolls to the
+   next project (js/work.js). Mirrors lorenzodossi's `background: linear-gradient
+   (#9c9c9c 30%, #000, #9c9c9c 65%) 100% / 300% text; :hover{position:0}`. */
+.showcase-next {
+  position: relative;
+  display: inline-flex; align-items: center; gap: var(--sp-1);
+  font-size: var(--fs-sm); font-weight: 400;
+  letter-spacing: -0.01em; line-height: 1.5;
+  white-space: nowrap;
+  background: linear-gradient(to right,
+              var(--text-tertiary) 30%, var(--text-primary), var(--text-tertiary) 65%)
+              right center / 300% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  transition: background-position var(--t-wave) var(--ease-glide);
+}
+.showcase-next:hover { background-position: left center; }
+.showcase-next-arrow {
+  width: 12px; height: 12px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  opacity: 0.4;
+  transition: opacity var(--t-slow) var(--ease-glide),
+              color var(--t-slow) var(--ease-glide);
+}
+.showcase-next:hover .showcase-next-arrow { opacity: 1; color: var(--text-primary); }
+@media (prefers-reduced-motion: reduce) {
+  .showcase-next { transition: none; }
+  .showcase-next-arrow { transition: none; }
+}
+
+/* ============================================================
+   PROGRESS TRACKER (floating pill on case-study pages)
+   ============================================================ */
+/* The tracker IS the pill: a single bottom-anchored, overflow-hidden
+   container holding the header row + the menu. Tapping it animates its
+   HEIGHT (header-only → header+menu) so it grows upward in place, and
+   eases the corner radius from a full pill to a rounded card — the
+   tommysmith.co interaction. JS sets the exact open/closed pixel height. */
+.progress-tracker {
+  position: fixed;
+  bottom: var(--sp-8); left: var(--sp-7);
+  z-index: 200;
+  display: flex; flex-direction: column;
+  width: 236px;                 /* closed width (Figma); morphs wider on open */
+  height: 48px;                 /* collapsed to the header; JS refines */
+  overflow: hidden;
+  background: #1a1a1a;            /* #29: Figma nav pill on light pages (940:18206) */
+  border-radius: var(--r-pill);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  /* Tommy's exact framer-motion config (ease "easeInOut" = symmetric
+     cubic-bezier(0.42,0,0.58,1)): the pill SHAPE — width + radius — morphs
+     in 0.2s, while the menu HEIGHT reveals over the slightly slower 0.3s.
+     The two speeds give the quick pill→card morph + gentler content reveal. */
+  transition: width 200ms cubic-bezier(0.42, 0, 0.58, 1),
+              border-radius 200ms cubic-bezier(0.42, 0, 0.58, 1),
+              height 300ms cubic-bezier(0.42, 0, 0.58, 1),
+              transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.progress-tracker.open {
+  width: min(320px, calc(100vw - 40px));
+  border-radius: 16px;
+}
+.progress-tracker.hidden { transform: translateY(calc(100% + var(--sp-8))); }
+.progress-pill {                /* header row — transparent toggle inside the tracker */
+  order: 0; flex-shrink: 0; width: 100%;
+  background: none;
+  padding: 12px 16px 12px 18px;
+  display: flex; align-items: center; gap: var(--sp-2);
+  white-space: nowrap;
+  font-family: var(--font);
+}
+.progress-pill-menu-icon {
+  width: 16px; height: 16px; flex-shrink: 0;   /* 16px hamburger (tommysmith.co) */
+  color: #A0A0A0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.progress-pill-menu-icon svg { width: 16px; height: 16px; display: block; }
+.progress-pill-label {
+  font-size: var(--fs-base); font-weight: 500;   /* 14px — same face/size as the menu items below (tommysmith.co) */
+  color: #e0e0e0; letter-spacing: -0.01em; line-height: 1.5;
+  /* truncate so the fixed-width closed pill never overflows (Tommy-style) */
+  min-width: 0; flex: 0 1 auto;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.progress-pill-chevron {
+  width: 17px; height: 17px; flex-shrink: 0;
+  color: #9F9F9F;
+  transition: transform 200ms ease;
+}
+.progress-pill.menu-open .progress-pill-chevron { transform: scaleY(-1); }
+.progress-pill-pct {
+  margin-left: auto;
+  flex-shrink: 0;
+  /* Fixed height + flex centering (tommysmith.co's exact technique). The chip
+     is sized by a fixed box — NOT by the text's line-box — so it can't reflow
+     as Open Runde loads or when the JS odometer swaps the plain "0%" text for
+     line-height:1 digit columns. That swap+font-load was what made the % drift
+     "more padding on top, then more below" during page load. min-width holds
+     the widest value ("100%") so digit-count changes never shift the row. */
+  display: flex; align-items: center; justify-content: center;
+  height: 24px; min-width: 48px;
+  padding: 0 12px;
+  background: #484848;
+  border-radius: var(--r-pill);
+  /* 14px / 500 — tommysmith.co's exact chip text (their `text-sm font-medium`),
+     applied on web + mobile alike so the chip reads the same size everywhere. */
+  font-size: var(--fs-base); font-weight: 500;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em; line-height: 1;
+}
+/* Odometer: digit columns roll vertically as the number changes. The chip's
+   fixed height + centering above keeps them optically centred at every value. */
+.progress-pill-pct.pct-odometer {
+  line-height: 1;
+}
+.pct-digits { display: inline-flex; }
+.pct-col {
+  display: inline-block;
+  height: 1em; overflow: hidden;
+  vertical-align: top;
+}
+.pct-strip {
+  display: flex; flex-direction: column;
+  transition: transform 0.34s cubic-bezier(0.62, 0.61, 0.02, 1);
+}
+.pct-strip span {
+  height: 1em; line-height: 1em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.progress-menu {              /* items — revealed below the header as the tracker grows */
+  order: 1; width: 100%; flex-shrink: 0;   /* don't let the flex column squish it — JS reads its (capped) height to size the open card */
+  padding: 0 0 var(--sp-2);
+  display: flex; flex-direction: column;
+  /* Cap the open menu and scroll inside it (tommysmith.co: max-h-[200px]
+     overflow-y-auto). Shows ~5 sections; the rest scroll internally rather
+     than growing the card to fit every item. JS reads this clamped height
+     when sizing the expanded tracker, so the card stops at header + 200px. */
+  max-height: 200px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #555 #2a2a2a;            /* tommysmith.co custom-scrollbar */
+}
+.progress-menu::-webkit-scrollbar { width: 4px; }
+.progress-menu::-webkit-scrollbar-track { background: #2a2a2a; border-radius: 2px; }
+.progress-menu::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
+.progress-menu::-webkit-scrollbar-thumb:hover { background: #777; }
+.progress-menu-item {
+  padding: var(--sp-3) var(--sp-5);
+  /* Same face/size/colour as the header label (tommysmith.co): 14px, #e0e0e0.
+     Tommy's list is uniform — no dimmed items, no bold "active" row; the
+     current section is shown by the header label, so items only brighten on
+     hover. */
+  font-size: var(--fs-base); font-weight: 400;
+  color: #e0e0e0;
+  letter-spacing: -0.01em; line-height: 1.5;
+  cursor: pointer; transition: color 100ms;
+  font-family: var(--font);
+}
+.progress-menu-item:hover { color: #fff; }
+
+/* Items cascade in when the menu opens — fade + slide from the left +
+   de-blur, 200ms easeInOut each, ~50ms apart (Tommy's framer item variant:
+   initial {opacity:0, x:-8, blur(5px)} → animate {opacity:1, x:0, blur(0)}). */
+@keyframes progressItemIn {
+  from { opacity: 0; transform: translateX(-8px); filter: blur(5px); }
+  to   { opacity: 1; transform: translateX(0);    filter: blur(0); }
+}
+.progress-tracker.open .progress-menu-item {
+  animation: progressItemIn 200ms cubic-bezier(0.42, 0, 0.58, 1) both;
+}
+.progress-tracker.open .progress-menu-item:nth-child(1)  { animation-delay: 80ms; }
+.progress-tracker.open .progress-menu-item:nth-child(2)  { animation-delay: 130ms; }
+.progress-tracker.open .progress-menu-item:nth-child(3)  { animation-delay: 180ms; }
+.progress-tracker.open .progress-menu-item:nth-child(4)  { animation-delay: 230ms; }
+.progress-tracker.open .progress-menu-item:nth-child(5)  { animation-delay: 280ms; }
+.progress-tracker.open .progress-menu-item:nth-child(6)  { animation-delay: 330ms; }
+.progress-tracker.open .progress-menu-item:nth-child(7)  { animation-delay: 380ms; }
+.progress-tracker.open .progress-menu-item:nth-child(8)  { animation-delay: 430ms; }
+.progress-tracker.open .progress-menu-item:nth-child(9)  { animation-delay: 480ms; }
+.progress-tracker.open .progress-menu-item:nth-child(10) { animation-delay: 530ms; }
+@media (prefers-reduced-motion: reduce) {
+  .progress-tracker.open .progress-menu-item { animation: none; }
+}
+
+/* ============================================================
+   MOBILE BACK BUTTON — floating black pill that replaces the sticky
+   topbar on phones (Figma mobile frames). Hidden on desktop; shown
+   by the responsive layer at ≤768px.
+   ============================================================ */
+.mobile-back {
+  display: none;
+  position: fixed;
+  bottom: var(--sp-6); left: var(--pad);   /* bottom row, left (16px gutter, Figma 1231:2292) */
+  z-index: 200;
+  width: 48px; height: 48px;
+  align-items: center; justify-content: center;
+  background: #1a1a1a;   /* Figma 1231:2292 — #1a1a1a in both light + dark (#40) */
+  border-radius: var(--r-pill);
+  color: #fff;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+}
+.mobile-back svg { width: 16px; height: 16px; display: block; }   /* Figma go-back icon, 16px */
+html.dark .mobile-back { background: #272727; border: 0.5px solid #202020; }   /* #49: Figma 1268:6306 dark go-back = #272727 */
+
+/* ============================================================
+   CONTROL PILL — floating Email + Sound + Theme controls on the
+   case-study + work pages (issue #45). Built by js/controls.js,
+   which injects #soundToggle / #themeToggle so sound.js + theme.js
+   bind them. A dark frosted pill (identical in both themes, per
+   Figma 1231:2400/1231:2462), pinned bottom-right so it clears the
+   bottom-left back button / progress pill.
+   ============================================================ */
+.ctrl-pill {
+  position: fixed;
+  right: var(--sp-7); bottom: var(--sp-8);   /* 24 / 32 */
+  z-index: 200;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 8px;
+  background: #1a1a1a;
+  border-radius: var(--r-pill);
+  -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+}
+/* #47: dark-mode pill colours from Figma 1231:1888 (light pill stays #1a1a1a). */
+html.dark .ctrl-pill {
+  background: #272727;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+}
+/* Buttons reuse .lp-icon (for the sound/theme icon-swap CSS) but are restyled as the
+   32px dark circular buttons from Figma. Colours are theme-independent (dark pill). */
+.ctrl-pill .lp-icon {
+  width: 32px; height: 32px;
+  background: #212121; border: 1px solid #303030;
+  border-radius: var(--r-pill);
+  color: #a1a1a1;
+  transition: color var(--t-fast) var(--ease-out), background var(--t-fast) var(--ease-out);
+}
+/* #47: dark button fill/stroke from Figma 1231:1890 (#303030 bg, #373737 border). */
+html.dark .ctrl-pill .lp-icon,
+html.dark .ctrl-toggle { color: #a1a1a1; background: #303030; border-color: #373737; }
+.ctrl-pill .lp-icon:hover { color: #fff; background: #2a2a2a; }
+html.dark .ctrl-pill .lp-icon:hover,
+html.dark .ctrl-toggle:hover { color: #fff; background: #3a3a3a; }
+.ctrl-pill .lp-icon svg { width: 18px; height: 18px; }
+/* No tooltips on the pill (they'd sit off-screen in the corner; aria-label covers a11y). */
+.ctrl-pill .lp-icon[data-tooltip]::after { content: none; }
+
+/* Collapsible trigger ('...' / close). Hidden on desktop — there the pill is always
+   open. On mobile (Figma 1231:2462) the pill collapses to this 48px button and the
+   controls expand on tap. */
+.ctrl-toggle {
+  display: none;
+  width: 32px; height: 32px; padding: 0;
+  align-items: center; justify-content: center;
+  background: #212121; border: 1px solid #303030; border-radius: var(--r-pill);
+  color: #a1a1a1; cursor: pointer;
+  transition: color var(--t-fast) var(--ease-out), background var(--t-fast) var(--ease-out);
+}
+.ctrl-toggle:hover { color: #fff; background: #2a2a2a; }
+.ctrl-toggle svg { width: 18px; height: 18px; display: block; }
+/* Hide the close glyph until open. Scoped under .ctrl-toggle so it beats the
+   `.ctrl-toggle svg { display:block }` rule above on specificity. */
+.ctrl-toggle .ctrl-icon-close { display: none; }
+@media (max-width: 768px) {
+  /* #48: on mobile the pill is rebuilt as a stack of separate 48px circles
+     (Figma 1231:2076 collapsed → 1231:2106 expanded), pinned bottom-right above
+     the reading-progress pill. Collapsed shows only the More button; tapping it
+     reveals Email / Sound / Theme above with a staggered entrance, and the More
+     glyph becomes a Close (X). Each circle is its own solid button (no container
+     fill), unlike the connected desktop pill. */
+  .ctrl-pill {
+    right: var(--pad); bottom: var(--sp-6);   /* bottom row, right (Figma 1231:2313) */
+    background: transparent; padding: 0; gap: 6px;
+    box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  /* #48: the desktop connected-pill rule (html.dark .ctrl-pill{background:#272727})
+     leaks into mobile via specificity and paints a container behind the buttons —
+     light has none. Force the mobile dark menu transparent so it matches light. */
+  html.dark .ctrl-pill { background: transparent; box-shadow: none; }
+  .ctrl-pill .lp-icon,
+  .ctrl-toggle {
+    width: 48px; height: 48px; border: none;
+    background: #1a1a1a;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  }
+  /* #62: icon size + colour to match Figma 1231:2106 — Email/Sound/Theme glyphs
+     are 20px, the More/Close toggle is 16px, all near-white on the dark circles
+     (was 18px and dim #a1a1a1). */
+  .ctrl-pill .lp-icon svg { width: 20px; height: 20px; }
+  .ctrl-toggle svg { width: 16px; height: 16px; }
+  .ctrl-pill .lp-icon, .ctrl-toggle,
+  html.dark .ctrl-pill .lp-icon, html.dark .ctrl-toggle { color: #fafafa; }
+  /* #48: same structure as the light row — separate solid circles, no outline or
+     container. Light circles are #1a1a1a on white; the dark ones are a lighter
+     surface (#303030, the #47 dark-button fill) so they read against the near-black
+     page while the #0d0d0d gaps separate them — only the colour differs. */
+  html.dark .ctrl-pill .lp-icon,
+  html.dark .ctrl-toggle { background: #303030; border: none; }
+  .ctrl-pill .lp-icon:hover,
+  .ctrl-toggle:hover { background: #272727; }
+  html.dark .ctrl-pill .lp-icon:hover,
+  html.dark .ctrl-toggle:hover { background: #303030; }
+
+  .ctrl-toggle { display: flex; }              /* More button visible (collapsed state) */
+  .ctrl-pill .lp-icon { display: none; }       /* the three controls hide when collapsed */
+  .ctrl-pill.open .lp-icon {
+    display: flex;
+    animation: fab-in 0.25s var(--ease-out) both;
+  }
+  /* Stagger the reveal from the bottom (nearest the toggle) upward. Children are
+     1=Email, 2=Sound, 3=Theme, 4=toggle. */
+  .ctrl-pill.open .lp-icon:nth-child(3) { animation-delay: 0s; }
+  .ctrl-pill.open .lp-icon:nth-child(2) { animation-delay: 0.04s; }
+  .ctrl-pill.open .lp-icon:nth-child(1) { animation-delay: 0.08s; }
+  .ctrl-pill.open .ctrl-icon-dots  { display: none; }
+  .ctrl-pill.open .ctrl-icon-close { display: block; }
+}
+@keyframes fab-in {
+  from { opacity: 0; transform: scale(0.6) translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ctrl-pill.open .lp-icon { animation: none; }
+}
+
+/* ============================================================
+   CLICK SPARK — the burst canvas is created + styled inline by
+   js/sound.js (ClickSpark effect ported from ch.sh). No CSS needed.
+   ============================================================ */
+
+/* ============================================================
+   RESPONSIVE
+   Layered breakpoints — each one only adds the overrides that
+   actually trigger at that width. Keep the desktop layout intact
+   above 1300px; collapse progressively below it.
+   ============================================================ */
+
+/* Tablet — collapse 113px page gutters to --pad. */
+@media (max-width: 1300px) {
+  .work-showcase-list,
+  .cs-layout,
+  .cs-page-header {
+    padding-left: var(--pad); padding-right: var(--pad);
+  }
+}
+
+/* Tablet portrait — work page rows stack, mockup goes fluid. */
+@media (max-width: 1024px) {
+  .showcase-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-8);
+  }
+  .showcase-mockup-col {
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+  }
+  .showcase-mockup {
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 855 / 610;
+  }
+  .browser-mockup-wrap {
+    width: 91%;
+    height: auto;
+    aspect-ratio: 778 / 522;
+  }
+  .showcase-info-col {
+    flex: 0 0 auto;
+    width: 100%;
+    align-items: flex-start;
+  }
+  .showcase-card {
+    width: 100%;
+    max-width: 348px;
+    margin: 0 auto;
+  }
+  .showcase-card-preview,
+  .showcase-card-body { width: 100%; }
+  .showcase-card-preview { height: auto; aspect-ratio: 324 / 185; }
+  .phone-img { width: 170px; height: auto; aspect-ratio: 200 / 433; }
+}
+
+/* Sidebar case studies + landing stack. Landing combined column widths
+   (365 + 100 gap + 390 = 855px) overflow below ~940px, so stack here. */
+@media (max-width: 940px) {
+  .cs-layout { flex-direction: column; gap: var(--sp-8); }
+  .cs-sidebar { width: 100%; position: static; }
+  .cs-page-header {
+    flex-direction: column; align-items: flex-start;
+    gap: var(--sp-5);
+  }
+
+  /* Landing — single column, Figma mobile arrangement (frame 879:13684):
+     name + icons share the top row, then the View-work card, then the
+     bio + sections, then the footer. We flatten the two desktop columns
+     with display:contents and re-order the leaf items; the icon cluster
+     pins to the top-right beside the name. */
+  .lp-content {
+    flex-direction: column;
+    gap: var(--sp-8);              /* 32px between identity / card / sections */
+    max-width: 100%;
+    position: relative;
+  }
+  .lp-left, .lp-top, .lp-right { display: contents; }
+  .identity       { order: 1; }
+  .view-work-card { order: 2; width: 100%; height: 220px; }
+  .sections       { order: 3; }
+  .lp-footer      { order: 4; margin-top: var(--sp-8); flex-wrap: wrap; gap: var(--sp-4); }
+  .lp-icons {
+    order: 0;
+    position: absolute;
+    /* align with the name block: 52px page top, and the 16px content gutter on the
+       right so the icon cluster mirrors the name's left inset (was flush to edge). */
+    top: var(--sp-11); right: var(--pad);
+  }
+}
+
+/* Mobile — featured case studies tighten, hero responsive. */
+@media (max-width: 768px) {
+  /* Mobile design system uses a 16px gutter across the whole range (every
+     390px Figma frame = 358px content column at 16px inset). */
+  :root { --pad: 16px; }
+
+  /* Featured case studies — content column at the 16px gutter. Hero sits 36px
+     above the first section (Figma mobile: content-stack gap = 36). */
+  .cs-featured {
+    padding: 0 var(--pad);
+    gap: var(--sp-9);
+  }
+
+  /* Swap the hero eyebrow + big title for the Figma compact brand header
+     (logo + name + visit arrow / tagline). */
+  .cs-featured-brand { display: flex; margin-bottom: var(--sp-8); }
+  .cs-hero-header { display: none; }
+
+  /* Typography: Figma's mobile case-study frames drop section titles and
+     insight quotes from 20px to 16px (sidebar studies are already 16px). */
+  .cs-block-title { font-size: var(--fs-lg); }
+  .cs-quote-text  { font-size: var(--fs-lg); letter-spacing: -0.01em; }
+
+  /* Swap the wide web-view hero for the Work-card preview image. */
+  .cs-hero .cs-breakout { display: none; }
+  .cs-hero-mobile-media {
+    display: block;
+    width: 100%;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .cs-hero-mobile-media img { width: 100%; height: auto; display: block; }
+
+  /* Swap the final-design web composition for the mobile-tuned image.
+     #24,#26: the light mobile asset has a white card baked in; in dark use the
+     Figma export (934:16354 VMD / 934:16650 Bayut) which has no white bg. */
+  /* #70: show the same exported Safari browser mockup on mobile too (hide the
+     old static image) — the 725x554 mockup scales down to the column width. */
+  .cs-final-mobile { display: none; }
+
+  /* Hero title row — title above the visit button, button stays inline */
+  .cs-hero-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sp-5);
+  }
+  .cs-hero-title { font-size: var(--fs-2xl); }
+
+  .cs-hero { gap: var(--sp-6); }   /* #66/#67: Figma mobile hero gap = 20 (was 32) */
+  /* Stats — single stacked column (Figma featured mobile: Role / Timeline
+     / Team / Scope, label over value, 20px apart). */
+  .cs-stats-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-6);
+  }
+  .cs-stat { gap: var(--sp-1); }
+
+  /* Wide breakouts collapse to the content column (358px within the 16px
+     page padding) — no full-bleed negative-margin on phones. */
+  .cs-breakout,
+  .cs-breakout--diagram,
+  .cs-breakout--xwide {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* 3-column overview grid — stack vertically */
+  .cs-grid-3 { flex-direction: column; gap: var(--sp-7); }
+
+  /* Section gap inside featured layout */
+  .cs-sections { gap: 48px; } /* Figma mobile: between-section gap = 48 */
+
+  /* Topbar — smaller top padding on mobile, keep the scroll-compaction */
+  .cs-topbar { padding: 40px var(--pad) 24px; }
+  .cs-topbar--scrolled { padding-top: 12px; padding-bottom: 52px; } /* same height invariant on mobile (40+24 -> 12+52) */
+  .cs-topbar-breadcrumb { gap: 20px; }
+  .cs-topbar--scrolled .cs-topbar-breadcrumb { gap: 12px; }
+  /* Phone row — let phones flex-wrap and shrink */
+  .cs-phone { width: 150px; height: 324px; }
+
+  /* Footers — wrap so the location bit drops underneath */
+  .cs-footer {
+    flex-wrap: wrap;
+    gap: var(--sp-4);
+    padding: var(--sp-7) var(--pad);
+  }
+
+  /* Progress tracker — pull in from edges */
+  .progress-tracker {
+    bottom: var(--sp-5);
+    left: var(--sp-5);
+  }
+}
+
+/* Below ~600px the fixed-aspect work-page mockup stage gets too short for
+   the phones inside — let the mockup grow to fit its content instead. Also,
+   the 4-up wide phone row would be too cramped — allow it to wrap to 2x2. */
+@media (max-width: 600px) {
+  .showcase-mockup {
+    aspect-ratio: auto;
+    height: auto;
+    min-height: 320px;
+    padding: var(--sp-7) 0;
+  }
+  /* Bayut mockup: the 3-up phone strip must fit the fluid stage — let the
+     phones shrink equally instead of the third being clipped by the mockup's
+     overflow:hidden. (Higher specificity beats the ≤480 .phone-img rule.) */
+  .phone-strip { width: 100%; gap: var(--sp-4); padding: 0 var(--sp-5); }
+  .phone-strip .phone-img {
+    flex: 1 1 0; min-width: 0;
+    width: auto; height: auto; aspect-ratio: 200 / 433;
+  }
+
+  .cs-phone-row--wide {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .cs-phone-row--wide .cs-phone {
+    flex: 0 0 calc(50% - var(--sp-3));
+    max-width: 182px;
+  }
+
+  /* Progress pill keeps its exact Figma size on mobile (236px min-width,
+     18/16/12 padding from the base rule). The % chip is now a fixed-height
+     flex-centred box (see .progress-pill-pct) that is identical on web and
+     mobile, so no mobile-specific override is needed. */
+
+  /* Touch targets: pad work-page text links so they clear the WCAG 2.5.8
+     24px minimum on touch (desktop with a mouse is fine at the smaller size). */
+  .showcase-ext-link { padding-block: 4px; }
+  .showcase-next { padding-block: 6px; }
+}
+
+/* Small mobile — tighter padding + smaller hero title. */
+@media (max-width: 480px) {
+  .cs-hero-title { font-size: var(--fs-xl); }
+  .cs-phone { width: 140px; height: 304px; }
+  .phone-img { width: 140px; }
+  .cs-stats-row { gap: var(--sp-6); }   /* #66/#67: Figma mobile stats gap = 20 (was 16) */
+  .lp-icon img, .lp-icon svg { width: 22px; height: 22px; }
+
+  /* Allow brand tagline to wrap below the brand name on very narrow screens */
+  .cs-brand-info { flex-wrap: wrap; }
+  .cs-brand-tagline { white-space: normal; }
+}
+
+/* ============================================================
+   WORK PAGE — mobile (Figma frame 904:21627)
+   Phones drop the big browser/phone stage; each project becomes
+   just its info card (the mockup lives on as the card preview).
+   The sticky topbar is replaced by the floating back button.
+   ============================================================ */
+@media (max-width: 768px) {
+  .work-main .cs-topbar { display: none; }
+  .work-main .mobile-back { display: flex; }
+
+  /* No topbar → restore the 52px top breathing room from Figma. */
+  .work-main { padding-top: 52px; }
+
+  /* Figma ends the page ~52px after the last content (was 120px). Applies
+     to every page type on phones: case studies, landing, and work. */
+  .cs-page, .lp-main, .work-main { padding-bottom: var(--sp-11); }
+
+  /* Drop the standalone mockup stage; keep only the info card column. */
+  .showcase-mockup-col { display: none; }
+
+  /* Each project row = one stacked card, 48px between projects
+     (24px row padding top+bottom between adjacent rows). */
+  .showcase-row { padding: var(--sp-7) 0; }
+  .work-showcase-list > .showcase-row:first-of-type { padding-top: 0; }
+
+  .showcase-info-col { width: 100%; gap: var(--sp-8); align-items: center; }
+  .showcase-card { width: 100%; max-width: 358px; }
+}
+
+/* ============================================================
+   SIDEBAR CASE STUDIES — mobile (THB 879:13839, Swarp 890:14626,
+   Holos 890:15025, VYBSTK 890:15412)
+   Topbar → floating back button; progress pill moves bottom-right;
+   sidebar becomes a full-width card; phone rows go 2-up at 174px
+   (10px gap) or single-centered at 182px, per Figma section counts.
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Nav: hide the sticky breadcrumb, reveal the floating back button,
+     and send the progress pill to the bottom-right (Figma bottom bar). */
+  .cs-page .cs-topbar { display: none; }
+  .cs-page .mobile-back { display: flex; }
+  .cs-topbar + .cs-page-header { padding-top: var(--sp-11); }
+  /* Bottom bar = three controls in ONE row (Figma 1231:2291): back button (left),
+     reading-progress pill (middle), control FAB (right) — all at bottom:20.
+     The progress pill FILLS the gap between the back button and the FAB
+     (each 48px at a 16px gutter, + 8px breathing room), so it can never overlap
+     either one — closed or open. It grows upward in place when the menu opens. */
+  .progress-tracker {
+    left: calc(var(--pad) + 48px + var(--sp-3));    /* clear of the back button */
+    right: calc(var(--pad) + 48px + var(--sp-3));   /* clear of the FAB */
+    bottom: var(--sp-6);
+    width: auto;
+  }
+  /* On open it keeps the same left/right span (fills the middle) and only grows
+     upward — overriding the desktop rule that widens the pill to 320px. */
+  .progress-tracker.open { width: auto; }
+
+  /* Header: logo + name + visit arrow inline on the first row, tagline
+     wraps to its own line below (Figma mobile). Flatten brand/brand-info
+     with display:contents and re-order the leaf items; the Visit pill
+     collapses to just its arrow icon. */
+  .cs-page-header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--sp-1) var(--sp-2);
+    margin-bottom: var(--sp-8);   /* 32px header → sidebar card (Figma) */
+  }
+  .cs-brand, .cs-brand-info { display: contents; }
+  .cs-brand-logo    { order: 1; }
+  .cs-brand-name    { order: 2; }
+  /* The link-icon pill (#38/#39) pins to the right of the logo+name row; the
+     tagline wraps to its own line below. (Was keyed to the old .cs-visit-btn,
+     which no longer exists — so the icon defaulted to order 0 and rendered on the
+     far left. Re-key to .cs-visit-link and push it right with margin-left:auto.) */
+  .cs-visit-link    { order: 3; margin-left: auto; flex-shrink: 0; }
+  .cs-brand-tagline { order: 4; flex-basis: 100%; white-space: normal; }
+  .cs-brand-sep     { display: none; }
+
+  /* Sidebar → full-width card, 36px gap before the main column. */
+  .cs-layout { gap: var(--sp-9); }
+
+  /* Sidebar field labels are #afafaf in Figma (a hair lighter than the
+     #a1a1a1 tertiary token). Light mode only — dark keeps its #525252. */
+  html:not(.dark) .cs-sidebar-label { color: #afafaf; }
+
+  /* Main: 36px text→media, 48px between sections (extra 12 before any
+     text block that follows a phone row). */
+  .cs-phone-row + .cs-text-block { margin-top: var(--sp-4); }
+
+  /* Phone rows: 2-up at 174px (10px gap); single-phone rows centered
+     at the full 182px. Higher specificity beats the ≤600/≤480 rules. */
+  .cs-phone-row, .cs-phone-row--wide {
+    width: 100%; max-width: 358px; margin: 0 auto;
+    gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+  .cs-phone-row .cs-phone,
+  .cs-phone-row--wide .cs-phone {
+    flex: 0 0 calc(50% - 5px);
+    width: calc(50% - 5px);
+    max-width: 182px;
+    height: auto;
+    aspect-ratio: 182 / 394;
+  }
+  .cs-phone-row:has(.cs-phone:only-child) .cs-phone {
+    flex-basis: 182px; width: 182px;
+  }
+
+  /* Figma's mobile frames show fewer phones per section than desktop —
+     drop the exact ones Figma omits, and center any row that's left with
+     a single phone at the full 182px. */
+  .cs-phone.cs-phone--mhide { display: none; }
+  .cs-phone-row--m1 .cs-phone:not(.cs-phone--mhide) {
+    flex-basis: 182px; width: 182px;
+  }
+  /* #72: --m2 rows show TWO phones on mobile (e.g. Holos settings = screenshot
+     + video, per Figma 934:15961) — fit them 2-up at the Figma ~174px width. */
+  .cs-phone-row--m2 .cs-phone:not(.cs-phone--mhide) {
+    flex: 1 1 0; min-width: 0; width: auto; max-width: 175px;
+    height: auto; aspect-ratio: 174 / 377;
+  }
+}
+
+/* Hide layout until JSON content is painted, so you don't see empty shells. */
+html:not(.portfolio-ready) .lp-main,
+html:not(.portfolio-ready) .work-main {
+  opacity: 0;
+}

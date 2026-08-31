@@ -1,0 +1,255 @@
+/* ── VirtualMD page-only styles ──
+       Shared cs-* primitives are in css/style.css. Only VMD-unique
+       compositions live here: hero background, annotated screenshot,
+       research photo grid, competitive mosaic, problem insight. */
+
+    /* Hero background image bleeds behind the hero PNG. */
+    /* Hero media — column-width (725) rounded mockup (Figma 1163:1900).
+       Static frame for now; aspect differs web vs mobile (Figma crops). */
+    .vmd-hero-media {
+      width: 100%; aspect-ratio: 725 / 485;
+      border-radius: var(--r-md); overflow: hidden;
+    }
+    .vmd-hero-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    @media (max-width: 768px) { .vmd-hero-media { aspect-ratio: 358 / 278; } }
+
+    /* Userflow (Figma 1163:2136): the flowchart sits at 725 column width inside a
+       bg-subtle card with hairline border + 8px radius. The card chrome + diagram
+       are exported as one themed image (light/dark), so the wrapper just sizes it. */
+    .vmd-uf img { width: 100%; height: auto; display: block; }
+
+    /* Final design mockup — 725 column width (Figma 1163:2628), light/dark swap. */
+    .vmd-final { aspect-ratio: 725 / 554; overflow: hidden; border-radius: var(--r-md);   /* Figma 1163:2628 browser mockup */
+                 border: 0.5px solid var(--border); background: var(--bg); display: flex; flex-direction: column; }
+    .vmd-final .browser-screen { flex: 1; min-height: 0; }
+    .vmd-final img { width: 100%; height: auto; display: block; }
+    .vmd-browser-bar { flex-shrink: 0; }   /* exported Safari toolbar (lt/dk swap below) */
+
+    /* Overview uses a 24px internal gap (Figma 1163:1916), vs the 36px standard. */
+    #overview { gap: var(--sp-7); }
+
+    /* IA tree + empathy map — 725 column width (Figma 1177:5605 / 1177:5234). */
+    .vmd-ia img,
+    .vmd-emp img { width: 100%; height: auto; display: block; }
+
+    /* Theme image-swap for the column-width media. The global swap in style.css is
+       scoped to `.cs-breakout > img`, which these column-width containers are not —
+       so the light/dark pair is swapped here instead (default shows .lt, dark .dk). */
+    .vmd-jm-frame > img.dk,
+    .vmd-uf > img.dk,
+    .vmd-ia > img.dk,
+    .vmd-emp > img.dk,
+    .vmd-screenshot > img.dk,
+    .vmd-final > img.dk { display: none; }
+    html.dark .vmd-jm-frame > img.lt,
+    html.dark .vmd-uf > img.lt,
+    html.dark .vmd-ia > img.lt,
+    html.dark .vmd-emp > img.lt,
+    html.dark .vmd-screenshot > img.lt,
+    html.dark .vmd-final > img.lt { display: none; }
+    html.dark .vmd-jm-frame > img.dk,
+    html.dark .vmd-uf > img.dk,
+    html.dark .vmd-ia > img.dk,
+    html.dark .vmd-emp > img.dk,
+    html.dark .vmd-screenshot > img.dk,
+    html.dark .vmd-final > img.dk { display: block; }
+
+    /* Customer-journey cards: stickies (Expectations/Goals/Frustrations) + matrix.
+       Both at 725 column width in a bg-subtle card (Figma 1193:5505 / 1201:14030,
+       px-32 py-4.5 r-8). Same image web + mobile; 14px gap between the two cards. */
+    .vmd-jm-stack { display: flex; flex-direction: column; gap: 14px; }
+    .vmd-jm-frame {
+      background: var(--bg-subtle);
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 4.5px 32px;
+    }
+    .vmd-jm-frame img { width: 100%; height: auto; display: block; }
+    @media (max-width: 768px) {
+      .vmd-jm-frame { padding: 4.5px; border-radius: var(--r-sm); }
+    }
+
+    /* ── Problem: annotated screenshot ──
+       1421px wide. Left annotation column + 724px centered image +
+       right annotation column. Margins push out to break out of
+       the 724px content column. */
+    .vmd-annotated {
+      width: min(var(--bp-3), 100vw);
+      margin-left: calc((min(var(--bp-3), 100vw) - 100%) / -2);
+      display: flex;
+      align-items: stretch;
+    }
+    .vmd-ann-left  { flex: 1; min-width: 0; display: flex; align-items: flex-end; padding-bottom: 44px; }
+    .vmd-ann-right { flex: 1; min-width: 0; display: flex; flex-direction: column;
+                     justify-content: space-between; padding: 100px 0 44px; }
+    .vmd-ann-center { flex: 0 0 724px; width: 724px; }
+    .vmd-screenshot { width: 100%; border-radius: var(--r-sm); overflow: hidden;
+                      box-shadow: 0 2px 16px rgba(0,0,0,0.1); }
+    .vmd-screenshot img { width: 100%; height: auto; display: block; }
+    .vmd-prob-mob { display: none; }   /* #19: desktop shows the composite, mobile the screenshot */
+
+    .vmd-ann-text-main {
+      font-family: var(--font-hand);
+      font-size: var(--fs-md);
+      color: var(--text-black);
+      line-height: 1.3;
+      letter-spacing: -0.15px;
+    }
+    .vmd-ann-text-sub {
+      font-family: var(--font-hand);
+      font-size: var(--fs-base);
+      color: #9d9d9d;   /* Figma callout sub — fixed in both themes */
+      line-height: 1.3;
+      letter-spacing: -0.14px;
+    }
+    .vmd-ann-left-item,
+    .vmd-ann-right-item { display: flex; align-items: stretch; width: 100%; }
+    .vmd-ann-left-item-text,
+    .vmd-ann-right-item-text {
+      flex: 1; min-width: 0;
+      display: flex; flex-direction: column; gap: var(--sp-5);
+    }
+    .vmd-ann-left-item-text  { padding-right: var(--sp-5); }
+    .vmd-ann-right-item-text { padding-left:  var(--sp-5); }
+
+    .vmd-ann-connector { display: flex; align-items: center; flex-shrink: 0;
+                         width: 101px; padding: var(--sp-7) 0; }
+    .vmd-ann-connector-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(56, 24, 191, 0.25);
+      flex-shrink: 0;
+    }
+    .vmd-ann-connector-line { flex: 1; height: 1px; }
+    .vmd-ann-left  .vmd-ann-connector-line  { background: linear-gradient(to right, rgba(205,197,239,0.31), #CDC5EF); }
+    .vmd-ann-right .vmd-ann-connector-line  { background: linear-gradient(to right, #CDC5EF, rgba(205,197,239,0.31)); }
+    /* #55: dark-mode connector colours from Figma 1197:10277 — the line is a deep
+       purple (#2a1e5c) fading into the page (#0d0d0d), the dot a muted #281d59
+       (vs the light-mode #cdc5ef / #3818bf). Themed in CSS so each mode is correct. */
+    html.dark .vmd-ann-connector-dot { background: #281d59; }
+    html.dark .vmd-ann-left  .vmd-ann-connector-line { background: linear-gradient(to right, #0d0d0d, #2a1e5c); }
+    html.dark .vmd-ann-right .vmd-ann-connector-line { background: linear-gradient(to right, #2a1e5c, #0d0d0d); }
+
+    /* ── Mobile Problem-section list (code-built) ──
+       Desktop shows these three observations as side annotations on the
+       annotated screenshot (.vmd-ann-left / .vmd-ann-right). Those are
+       hidden ≤900px, so on phones Figma (VirtualMD-Mobile, 934:16178)
+       stacks them as a list under the screenshot. Hand font, same as the
+       desktop annotations. Hidden on desktop. */
+    .vmd-problem-list { display: none; }
+    @media (max-width: 900px) {
+      .vmd-problem-list {
+        display: flex; flex-direction: column;
+        gap: var(--sp-7);   /* 24px between items */
+        width: 100%;
+        font-family: var(--font-hand);
+      }
+      .vmd-problem-item {
+        display: flex; flex-direction: column;
+        gap: var(--sp-4);   /* 12px title→sub */
+      }
+      .vmd-problem-item-main {
+        font-size: var(--fs-md);   /* 15px */
+        color: var(--text-black);
+        line-height: 1.3;
+        letter-spacing: -0.15px;
+      }
+      .vmd-problem-item-sub {
+        font-size: var(--fs-base); /* 14px */
+        color: #9d9d9d;
+        line-height: 1.3;
+        letter-spacing: -0.14px;
+      }
+    }
+
+    /* ── Research photo grid — 725px column width (Figma 1163:1981: 725×465,
+       6px gaps, two equal columns: left = 2 stacked photos, right = 1 tall). ── */
+    .vmd-photo-grid {
+      display: flex; gap: 6px; align-items: stretch;
+      aspect-ratio: 725 / 465;
+    }
+    .vmd-photo-stack { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .vmd-photo-half { flex: 1; border-radius: var(--r-sm); overflow: hidden; }
+    .vmd-photo-tall { flex: 1; border-radius: var(--r-sm); overflow: hidden; }
+    .vmd-photo-half img,
+    .vmd-photo-tall img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ── Competitive mosaic (1228px-wide framed grid) ── */
+    /* Competitive moodboard — 725 column width (Figma 1163:2028 / dark 1197:12100).
+       The bg-subtle card chrome is baked into the themed export, so the desktop
+       container just sizes the image. Mobile keeps its own narrower mosaic frame. */
+    .vmd-competitive { width: 100%; }
+    .vmd-competitive .comp-dark { display: none; }
+    html.dark .vmd-competitive .comp-light { display: none; }
+    html.dark .vmd-competitive .comp-dark { display: block; }
+    /* #50: mobile competitive = one CSS card (Figma 934:16225 — bg-subtle, 0.5px
+       border, 6px radius, 40px top/bottom padding) holding the transparent moodboard
+       photos. Identical structure in light + dark — only the card colours differ —
+       so dark now matches the light card's dimensions/spacing exactly. */
+    .vmd-competitive-mobile {
+      display: none;
+      background: #fbfbfb;
+      border: 0.5px solid #e8e8f0;
+      border-radius: var(--r-sm);
+      padding: 40px 0;
+      overflow: hidden;
+    }
+    .vmd-competitive-mobile img { width: 100%; height: auto; display: block; }
+    html.dark .vmd-competitive-mobile { background: #161616; border-color: #303030; }
+    .vmd-competitive-img { display: block; width: 100%; height: auto; }
+
+    /* ── Insight block (closing quote in Customer journey section) ── */
+    .vmd-insight { display: flex; flex-direction: column; gap: var(--sp-4); }
+    .vmd-insight-title {
+      font-size: var(--fs-lg); font-weight: 500; color: var(--text-black);   /* #43.2: Figma 1163:2618 = 16px Medium (was 20px) */
+      letter-spacing: -0.01em; line-height: 1.5;
+    }
+    .vmd-insight-body {
+      font-size: var(--fs-md); font-weight: 400; color: var(--text-secondary);
+      letter-spacing: -0.01em; line-height: 1.5;
+    }
+
+    /* ── Mobile/tablet — collapse breakout compositions ── */
+    @media (max-width: 900px) {
+      /* Annotated Problem (#19): desktop shows the full Figma composite; on mobile
+         swap to the plain screenshot (the annotations stack as the list below). */
+      .vmd-prob-img { display: none; }
+      .vmd-prob-mob { display: block; }
+
+      /* Photo grid (Figma mobile): two photos side-by-side on top,
+         the third full-width below. */
+      .vmd-photo-grid {
+        flex-direction: column;
+        width: 100%;
+        margin-left: 0;
+        gap: 6px;
+        aspect-ratio: auto;   /* mobile stacks; height comes from content */
+      }
+      .vmd-photo-stack {
+        flex-direction: row;   /* the two halves sit side-by-side */
+        gap: 6px;
+      }
+      .vmd-photo-half {
+        min-height: 0;
+        aspect-ratio: 176 / 204;
+      }
+      .vmd-photo-tall {
+        flex: 0 0 auto;
+        width: 100%;
+        min-height: 0;
+        aspect-ratio: 358 / 204;
+      }
+
+      /* Competitive: hide the desktop scatter, show the mobile card (styled above). */
+      .vmd-competitive { display: none; }
+      .vmd-competitive-mobile { display: block; }
+
+      /* #51: Problem mobile screenshot — 6px corner radius (Figma 934:16177). */
+      .vmd-prob-mob img { border-radius: var(--r-sm); }
+
+      /* #52: section corner radius on mobile (Figma 934:16200 research photos = 8px;
+         empathy 1209:16312 / IA 1210:16330 / userflow 1213:16337 cards = 8px).
+         The card chrome is baked square into the export, so the wrapper clips it
+         to a true 8px regardless of the image's display scale. */
+      .vmd-photo-half, .vmd-photo-tall { border-radius: var(--r-md); }
+      .vmd-emp, .vmd-ia, .vmd-uf { border-radius: var(--r-md); overflow: hidden; }
+    }

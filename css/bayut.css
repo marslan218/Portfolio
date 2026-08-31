@@ -1,0 +1,64 @@
+/* ── Bayut page-only styles ──
+       Shared cs-* primitives live in css/style.css. The redesign (#44) moves
+       every diagram/visual to 725 COLUMN width inside a bg-subtle card. Each
+       card's chrome (bg-subtle, 0.5px border, 8px radius, 32px padding) plus
+       its diagram is exported as ONE themed image per theme (light/dark), so
+       these wrappers only size the image — no per-card chrome CSS, mirroring
+       the VirtualMD rebuild. Same image is used web + mobile (725 → 358 = 2x). */
+
+    /* Hero media — column-width (725×485) rounded property still (Figma 1169:3885). */
+    .bayut-hero-media {
+      width: 100%; aspect-ratio: 725 / 485;
+      border-radius: var(--r-md); overflow: hidden;
+    }
+    .bayut-hero-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    @media (max-width: 768px) { .bayut-hero-media { aspect-ratio: 358 / 278; } }
+
+    /* Column-width image cards: PRD (1169:3460), persona (1169:3472),
+       empathy (1169:3550), userflow (1169:3586), final (1169:3632). */
+    .bayut-prd img,
+    .bayut-persona img,
+    .bayut-empathy img,
+    .bayut-userflow img,
+    .bayut-final img { width: 100%; height: auto; display: block; }
+
+    /* Final-design panel (Figma 1169:3632 = 725×758, #fbfbfb): the iPhone mockup
+       sits centred inside it. */
+    .bayut-final {
+      aspect-ratio: 725 / 758;
+      background: #fbfbfb;
+      border: 0.5px solid var(--border);
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    html.dark .bayut-final { background: var(--bg-subtle); }
+
+    /* Theme image-swap for the column-width media. The global swap in style.css
+       is scoped to `.cs-breakout > img`, which these column-width containers are
+       not — so the light/dark pair is swapped here (default shows .lt, dark .dk). */
+    .bayut-prd > img.dk,
+    .bayut-persona > img.dk,
+    .bayut-empathy > img.dk,
+    .bayut-userflow > img.dk,
+    .bayut-final > img.dk { display: none; }
+    html.dark .bayut-prd > img.lt,
+    html.dark .bayut-persona > img.lt,
+    html.dark .bayut-empathy > img.lt,
+    html.dark .bayut-userflow > img.lt,
+    html.dark .bayut-final > img.lt { display: none; }
+    html.dark .bayut-prd > img.dk,
+    html.dark .bayut-persona > img.dk,
+    html.dark .bayut-empathy > img.dk,
+    html.dark .bayut-userflow > img.dk,
+    html.dark .bayut-final > img.dk { display: block; }
+
+    /* #53: section corner radius on mobile — Figma Bayut-Mobile cards are 8px
+       (PRD 934:16546, persona 1169:4823, empathy 1169:5046, userflow 1169:4984,
+       final 934:16650). The card chrome is baked square into the export, so the
+       wrapper clips it to a true 8px regardless of the image's display scale. */
+    @media (max-width: 768px) {
+      .bayut-prd, .bayut-persona, .bayut-empathy, .bayut-userflow, .bayut-final {
+        border-radius: var(--r-md); overflow: hidden;
+      }
+    }
